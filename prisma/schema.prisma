@@ -1,0 +1,264 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+//migration command npx prisma migrate dev --name init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+//2.1 Basic Preferences
+model wg_local_config{
+  pc_no           Int       @default(autoincrement()) 
+  connection_type Int       @db.Int
+  env_driver      String    @db.VarChar(150)
+  env_server      String    @db.VarChar(150)
+  env_dsn         String    @db.VarChar(150)
+  env_db_name     String    @db.VarChar(150)
+  env_dbq         String    @db.VarChar(150)
+  env_id          String    @db.VarChar(150)
+  env_pwd         String    @db.VarChar(150)
+  env_connection  String    @db.VarChar(150)
+  keep_connection Int       @db.TinyInt
+  dbms_type       String    @db.VarChar(20)
+  api_mode_use_yn Int       @db.TinyInt
+  api_mode_url    String    @db.VarChar(150)
+  worker          String    @db.VarChar(50)
+  update_date     String    @db.VarChar(8)
+  update_time     String    @db.VarChar(8)
+
+  @@id([pc_no])
+}
+
+
+// 2.2.	Administrator (person with access authority) management
+model wg_manager{
+  manager_id       Int      @default(autoincrement())
+  manager_name     String   @db.VarChar(100) 
+  manager_pwd      String   @db.VarChar(100)
+  auth_id          Int      @db.Int
+  group_id         Int?     @db.Int
+  group wg_manager_group?   @relation(fields: [group_id], references: [group_id], onDelete: Cascade, onUpdate: Cascade)
+  manager_phone_no String   @db.VarChar(50)
+  manager_desc     String   @db.VarChar(255)
+  worker_id        String   @db.VarChar(50)
+  updatedAt        DateTime?   
+  createdAt        DateTime @default(now())
+
+  @@id([manager_id])
+  @@unique([manager_id, group_id])
+  group_mst wg_name_group_mst[]
+}
+
+// 2.3.	Admin (inherited authority) group management
+model wg_manager_group{
+  group_id        Int       @default(autoincrement())
+  group_name      String    @db.VarChar(100)
+  group_desc      String    @db.VarChar(255)
+  updatedAt       DateTime? 
+  createdAt       DateTime  @default(now())
+  
+  manager wg_manager[]
+  @@id([group_id])
+
+}
+// 2.5.	gate passage setting
+
+
+//2.7.	Gate group settings
+
+model wg_name_group_mst{
+  group_no         Int      @default(autoincrement())
+  group_type       String   @db.Char(1)
+  description      String   @db.VarChar(100)
+  group_name       String   @db.VarChar(50)
+  worker_id        Int?     @db.Int
+  worker wg_manager?        @relation(fields: [worker_id], references: [manager_id], onDelete: Cascade, onUpdate: Cascade)
+  updatedAt        DateTime?
+  createdAt        DateTime @default(now())
+
+  @@id([group_no])
+  @@unique([group_no, group_type])
+}
+
+
+// RK DB
+// ..........................................................................................................
+// 1.1 Organization
+model organization{
+  id              Int       @default(autoincrement())
+  name            String    @db.VarChar(100)
+  address         String    @db.VarChar(255)
+  contact_no      String    @db.VarChar(50)
+  contact_person  String    @db.VarChar(100)
+  description     String    @db.VarChar(255)
+  logo_image      Bytes?      @db.VarBinary(255)
+  updatedAt       DateTime?
+  createdAt       DateTime  @default(now())
+
+
+  @@id([id])
+  org_group organization_group[]
+  user user[]
+  user_group user_group[]
+  doors doors[]
+  devices devices[]
+  device_log device_log[]
+}
+
+// 1.2.	orgaization group
+model organization_group{
+  id              Int       @default(autoincrement())
+  org  organization @relation(fields: [org_id], references: [id])
+  org_id          Int    
+  name            String    @db.VarChar(100)
+  description     String    @db.VarChar(255)
+  updatedAt       DateTime?
+  createdAt       DateTime  @default(now())
+
+  @@id([id])
+}
+
+model user{
+  id              Int       @default(autoincrement())
+  org_id          Int       
+  org organization @relation(fields: [org_id], references: [id])
+  name            String    @db.VarChar(100)
+  email           String    @db.VarChar(100)
+  password        String    @db.VarChar(100)
+  phone_no        String    @db.VarChar(50)
+  address         String    @db.VarChar(255)
+  description     String    @db.VarChar(255)
+  user_img        Bytes?      @db.VarBinary(255)
+  user_group_id   Int?      @db.Int
+  rfid_card_id         Int?      @db.Int
+  rfid_card   rfid_card?   @relation(fields: [rfid_card_id], references: [id])
+  user_group user_group?   @relation(fields: [user_group_id], references: [id])
+  updatedAt       DateTime?
+  createdAt       DateTime  @default(now())
+
+  @@id([id ])
+  @@unique([id, rfid_card_id])
+  device_log device_log[]
+}
+
+model user_group{
+  id              Int       @default(autoincrement())
+  org_id          Int
+  org organization @relation(fields: [org_id], references: [id])
+  group_name      String    @db.VarChar(100)
+  permission_id   Int
+  permission permission @relation(fields: [permission_id], references: [id])
+  updatedAt       DateTime?
+  createdAt       DateTime  @default(now())
+
+  @@id([id])
+  user user[]
+}
+
+model permission{
+  id              Int       @default(autoincrement())
+  name            String    @db.VarChar(100)
+  description     String    @db.VarChar(255)
+  updatedAt       DateTime?
+  createdAt       DateTime  @default(now())
+
+  @@id([id])
+  user_group user_group[]
+}
+
+model doors{
+  id            Int       @default(autoincrement())
+  org_id        Int
+  org organization @relation(fields: [org_id], references: [id])
+  name          String    @db.VarChar(100)
+  description   String    @db.VarChar(255)
+  door_no       String    @db.VarChar(50)
+  updatedAt     DateTime?
+  createdAt     DateTime  @default(now())
+
+  @@id([id])
+  device_log device_log[]
+  devices devices[]
+  
+}
+
+model devices{
+  id            Int       @default(autoincrement())
+  org_id        Int
+  org organization @relation(fields: [org_id], references: [id])
+  name          String    @db.VarChar(100)
+  description   String    @db.VarChar(255)
+  device_no     String    @db.VarChar(50)
+  device_typ   Int
+  device_type device_type @relation(fields: [device_typ], references: [id])
+  port_no       String    @db.VarChar(50)
+  door_id       Int?
+  door doors? @relation(fields: [door_id], references: [id])
+  updatedAt     DateTime?
+  createdAt     DateTime  @default(now())
+
+  @@id([id])
+  device_log device_log[]
+}
+
+model device_type{
+  id            Int       @default(autoincrement())
+  name          String    @db.VarChar(100)
+  description   String    @db.VarChar(255)
+  operation    String    @db.VarChar(50)
+  updatedAt     DateTime?
+  createdAt     DateTime  @default(now())
+
+  @@id([id])
+  devices devices[]
+}
+
+model device_log{
+  id            Int       @default(autoincrement())
+  org_id        Int
+  org organization @relation(fields: [org_id], references: [id])
+  device_id     Int
+  device devices @relation(fields: [device_id], references: [id])
+  door_id       Int
+  door doors @relation(fields: [door_id], references: [id])
+  user_id       Int
+  user user @relation(fields: [user_id], references: [id])
+  log_type      String    @db.VarChar(50)
+  log_date      DateTime?
+  updatedAt     DateTime?
+  createdAt     DateTime  @default(now())
+
+  @@id([id])
+}
+
+
+
+model commands{
+  id            Int       @default(autoincrement())
+  name      String    @db.VarChar(100)
+  command_value   String    @db.VarChar(100)
+  description   String    @db.VarChar(255)
+  updatedAt     DateTime?
+  createdAt     DateTime  @default(now())
+  @@id([id])
+
+}
+
+
+model rfid_card{
+  id            Int       @default(autoincrement())
+  card_no      String    @db.VarChar(100)
+  description   String    @db.VarChar(255)
+  isActive    Boolean   @default(true)
+  updatedAt     DateTime?
+  createdAt     DateTime  @default(now())
+
+  @@id([id])
+  user user[]
+}

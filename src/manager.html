@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <a href="../index.html" >back to home</a>
+    <h1>Add Manager</h1>
+    Manager Name:<input id="m_name"/>
+    Password:<input id="m_pass"/>
+    Auth:<select id="m_auth">
+        <option>---select---</option>       
+        <option value="1">Super Admin</option>
+        <option value="2">Admin</option>
+        <option value="3">Teacher</option>
+        <option value="4">Student</option>
+    </select>
+    Group:<select id="m_group">
+        <option>---select---</option>
+    </select>
+    Phone No:<input id="m_phone"/>
+    Description:<input id="m_desc"/>
+    <button id="btn">Submit</button>
+<br>
+<hr>
+<br>
+<h1>Display Group Data</h1>
+<table style="border:1px solid black">
+<thead>
+    <th>S.N</th>
+    <th>Manager Name</th>
+    <th>auth_id</th>
+    <th>Group</th>
+    <th>Phone No</th>
+    <th>description</th>
+    <th>edit</th>
+    <th>delete</th>
+</thead>
+    <tr>
+
+    </tr>
+</table>
+
+<!-- create model for update -->
+
+
+<div id="myModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h1>Update Group</h1>
+    <input id="manager_name" placeholder="Manager Name"/>
+    <select id="auth_id">
+        <option>---select---</option>       
+        <option value="1">Super Admin</option>
+        <option value="2">Admin</option>
+        <option value="3">Teacher</option>
+        <option value="4">Student</option>
+    </select>
+    <select id="manager_group_id">
+        <option>---select---</option>
+    </select>
+    <input id="manager_phone_no" placeholder="Phone No"/>
+    <input id="manager_desc" placeholder="Description"/>
+    <button id="update">Update</button>
+  </div>
+
+
+<script>
+// get data from manager group and set on select option
+    fetch("http://localhost:8082/managerGroup/getgroup")
+    .then(res=>res.json())
+    .then(data=>{
+        let group = document.getElementById("m_group");
+        data.forEach((item,index)=>{
+            let option = document.createElement("option");
+            option.value = item.group_id;
+            option.innerHTML = item.group_name;
+            group.appendChild(option);
+        })
+    })
+
+
+
+    // post the data for manager
+    document.getElementById("btn").addEventListener("click",function(){
+        let m_name = document.getElementById("m_name").value;
+        let m_pass = document.getElementById("m_pass").value;
+        let m_auth = document.getElementById("m_auth").value;
+        let m_group = document.getElementById("m_group").value;
+        let m_phone = document.getElementById("m_phone").value;
+        let m_desc = document.getElementById("m_desc").value;
+        let data = {
+            manager_name:m_name,
+            manager_password:m_pass,
+            auth_id:m_auth,
+            manager_group_id:m_group,
+            manager_phone_no:m_phone,
+            manager_desc:m_desc
+        }
+        console.log(data)
+        fetch("http://localhost:8082/manager/addmanager",{
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify(data)
+        }).then(res=>res.json())
+        .then(data=>{
+            console.log(data);
+            alert("data added successfully"); 
+            window.location.reload();
+
+        })
+    })
+
+
+    // get data from manager table
+    const table = document.querySelector("table");
+    const url = 'http://localhost:8082/manager/getmanager';
+    fetch(url)
+    .then(res=>res.json())
+    .then(data=>{
+        // console.log(data);
+        data.forEach((item,index)=>{
+            // console.log(item);
+            const row = table.insertRow(index + 1);
+            const cell1 = row.insertCell(0);
+            const cell2 = row.insertCell(1);
+            const cell3 = row.insertCell(2);
+            const cell4 = row.insertCell(3);
+            const cell5 = row.insertCell(4);
+            const cell6 = row.insertCell(5);
+            const cell7 = row.insertCell(6);
+            const cell8 = row.insertCell(7);
+            cell1.innerHTML = index + 1;
+            cell2.innerHTML = item.manager_name;
+            cell3.innerHTML = item.auth_id;
+            cell4.innerHTML =   item.group_name;
+            cell5.innerHTML = item.manager_phone_no;
+            cell6.innerHTML = item.manager_desc;
+            cell7.innerHTML = `<button id="edit" data-id="${item.manager_id}">Edit</button>`;
+            cell8.innerHTML = `<button id="delete" data-id="${item.manager_id}">Delete</button>`;
+        });
+    })
+
+    // delete data from manager table
+    table.addEventListener("click",function(e){
+        if(e.target.id == "delete"){
+            let id = e.target.dataset.id;
+            console.log(id);
+            fetch(`http://localhost:8082/manager/deletemanager/${id}`,{
+                method:"DELETE"
+            }).then(res=>res.json())
+            .then(data=>{
+                console.log(data);
+                alert("data deleted successfully");
+                window.location.reload();
+            })
+        }
+    })
+//use model for update
+                //get manager group data
+                fetch("http://localhost:8082/managerGroup/getgroup")
+                .then(res=>res.json())
+                .then(data=>{
+                    let group = document.getElementById("manager_group_id");
+                    data.forEach((item,index)=>{
+                        let option = document.createElement("option");
+                        option.value = item.group_id;
+                        option.innerHTML = item.group_name;
+                        group.appendChild(option);
+                    })
+                })
+    // Get the modal
+    var modal = document.getElementById("myModal");
+
+    // Get the button that opens the modal
+    var btn = document.getElementById("myBtn");
+
+    // Get the <span> element that closes the modal
+    var span = document.getElementsByClassName("close")[0];
+
+    // When the user clicks the button, open the modal 
+    table.addEventListener("click",function(e){
+        if(e.target.id == "edit"){
+            let id = e.target.dataset.id;
+            console.log(id);
+            fetch(`http://localhost:8082/manager/getmanager/${id}`)
+            .then(res=>res.json())
+            .then(data=>{
+                console.log(data);
+                modal.style.display = "block";
+                document.getElementById("manager_name").value = data.manager_name;
+                document.getElementById("auth_id").value = data.auth_id;
+                document.getElementById("manager_group_id").value = data.group_id;
+                document.getElementById("manager_phone_no").value = data.manager_phone_no;
+                document.getElementById("manager_desc").value = data.manager_desc;
+                document.getElementById("update").addEventListener("click",function(){
+                    let manager_name = document.getElementById("manager_name").value;
+                    let auth_id = document.getElementById("auth_id").value;
+                    let manager_group_id = document.getElementById("manager_group_id").value;
+                    let manager_phone_no = document.getElementById("manager_phone_no").value;
+                    let manager_desc = document.getElementById("manager_desc").value;
+                    let data = {
+                        manager_name: manager_name,
+                        auth_id: Number(auth_id),
+                        manager_group_id: Number(manager_group_id),
+                        manager_phone_no: manager_phone_no,
+                        manager_desc: manager_desc,
+                    }
+                    console.log(data);
+                    fetch(`http://localhost:8082/manager/editmanager/${id}`,{
+                        method:"PUT",
+                        headers:{
+                            "Content-Type":"application/json"
+                        },
+                        body:JSON.stringify(data)
+                    }).then(res=>res.json())
+                    .then(data=>{
+                        console.log(data);
+                        alert("data updated successfully");
+                        window.location.reload();
+                    })
+                })
+            })
+        }
+    })
+
+    // When the user clicks on <span> (x), close the modal
+    span.onclick = function() {
+    modal.style.display = "none";
+    }
+
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function(event) {
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+    }
+
+//delete the data
+    table.addEventListener("click",function(e){
+        if(e.target.id == "delete"){
+            let id = e.target.dataset.id;
+            console.log(id);
+            fetch(`http://localhost:8082/manager/deletemanager/${id}`,{
+                method:"DELETE"
+            }).then(res=>res.json())
+            .then(data=>{
+                console.log(data);
+                alert("data deleted successfully");
+                window.location.reload();
+            })
+        }
+    })
+    
+    
+
+</script>
+</body>
+</html>

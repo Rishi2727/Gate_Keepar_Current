@@ -1,0 +1,9 @@
+{
+    "applicationType": "Server",
+    "databaseType": "Mariadb",
+    "port": "3306",
+    "databaseName": "gate-V2",
+    "username": "MYPASS",
+    "password": "YOURPASS",
+    "host": "127.0.0.1"
+}

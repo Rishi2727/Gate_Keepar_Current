@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <a href="../index.html" >back to home</a>
+    <h1>Add Manager Group</h1>
+    Manager Group:<input id="group"/>
+    Group Description:<input id="desc"/>
+    <button id="btn">Submit</button>
+<br>
+<hr>
+<br>
+<h1>Display Group Data</h1>
+<table style="border:1px solid black">
+<thead>
+    <th>S.N</th>
+    <th>Group Name</th>
+    <th>Desc</th>
+    <th>edit</th>
+    <th>delete</th>
+</thead>
+    <tr>
+
+    </tr>
+</table>
+
+<!-- create model for update -->
+
+<div id="myModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h1>Update Group</h1>
+    <input id="group_name" placeholder="Group Name"/>
+    <input id="group_desc" placeholder="Group Description"/>
+    <button id="update">Update</button>
+  </div>
+
+
+<script>
+    // post the data for group manager
+    var btn = document.getElementById("btn");
+    btn.addEventListener("click", function(){
+        var group = document.getElementById("group").value;
+        var desc = document.getElementById("desc").value;
+        var data = {
+            "group_name": group,
+            "group_desc": desc
+        }
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "http://localhost:8082/managerGroup/addgroup", true);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.send(JSON.stringify(data));
+        xhr.onload = function(){
+            console.log(xhr.responseText);
+            alert(xhr.responseText); 
+            window.location.reload();
+        }
+    })
+
+    const table = document.querySelector("table");
+    const url = "http://localhost:8082/managerGroup/getgroup";
+    fetch(url)
+    .then((response) => response.json())
+    .then((data) => {
+        console.log(data);
+        data.forEach((item, index) => {
+            const row = table.insertRow(index + 1);
+            const cell1 = row.insertCell(0);
+            const cell2 = row.insertCell(1);
+            const cell3 = row.insertCell(2);
+            const cell4 = row.insertCell(3);
+            const cell5 = row.insertCell(4);
+            cell1.innerHTML = index + 1;
+            cell2.innerHTML = item.group_name;
+            cell3.innerHTML = item.group_desc;
+            cell4.innerHTML = `<a href="#" onclick='editGroup(${item.group_id})' id='${item.group_id}'>Edit</a>`;
+            cell5.innerHTML = `<a href="#" onclick='deleteGroup(${item.group_id})' id='${item.group_id}'>Delete</a>`;
+        })
+    })
+//delete the data
+    function deleteGroup(id){
+        console.log('clicked', id)
+        var xhr = new XMLHttpRequest();
+        xhr.open("DELETE", `http://localhost:8082/managerGroup/deletegroup/${id}`, true);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.send();
+        xhr.onload = function(){
+            console.log(xhr.responseText);
+            alert(xhr.responseText); 
+            window.location.reload();
+        }
+    }
+
+//use model for update
+    var modal = document.getElementById("myModal");
+    var span = document.getElementsByClassName("close")[0];
+    function editGroup(id){
+        console.log('clicked', id)
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", `http://localhost:8082/managerGroup/getgroup/${id}`, true);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.send();
+        xhr.onload = function(){
+            console.log(xhr.responseText);
+            var data = JSON.parse(xhr.responseText);
+            document.getElementById("group_name").value = data.group_name;
+            document.getElementById("group_desc").value = data.group_desc;
+            modal.style.display = "block";
+            var update = document.getElementById("update");
+            update.addEventListener("click", function(){
+                var group_name = document.getElementById("group_name").value;
+                var group_desc = document.getElementById("group_desc").value;
+                var data = {
+                    "group_name": group_name,
+                    "group_desc": group_desc
+                }
+                var xhr = new XMLHttpRequest();
+                xhr.open("PUT", `http://localhost:8082/managerGroup/editgroup/${id}`, true);
+                xhr.setRequestHeader("Content-Type", "application/json");
+                xhr.send(JSON.stringify(data));
+                xhr.onload = function(){
+                    console.log(xhr.responseText);
+                    alert(xhr.responseText); 
+                    window.location.reload();
+                }
+            })
+        }
+    }
+
+    span.onclick = function() {
+        modal.style.display = "none";
+    }
+
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+
+</script>
+</body>
+</html>

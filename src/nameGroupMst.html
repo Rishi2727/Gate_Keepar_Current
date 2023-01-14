@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <a href="../index.html" >back to home</a>
+    <h1>Add Name Group Mst</h1>
+    Group Name:<input id="g_name"/>
+    Group Type:<select id="g-type">
+        <option>---select---</option>       
+        <option value="S">S</option>
+        <option value="D">D</option>
+    </select>
+    Description:<input id="desc"/>
+    Worker:<select id="worker">
+        <option>---select---</option>
+    </select>
+    <button id="btn">Submit</button>
+<br>
+<hr>
+<br>
+<h1>Display Group Data</h1>
+<table style="border:1px solid black">
+<thead>
+    <th>S.N</th>
+    <th>Group Name</th>
+    <th>Group Type</th>
+    <th>desc</th>
+    <th>worker No</th>
+    <th>edit</th>
+    <th>delete</th>
+</thead>
+    <tr>
+
+    </tr>
+</table>
+
+<!-- create model for update -->
+
+
+<div id="myModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h1>Update Group</h1>
+    <input id="group_name" placeholder="Group Name"/>
+    <select id="group_type">
+        <option>---select---</option>       
+        <option value="S">S</option>
+        <option value="D">D</option>
+    </select>
+    <input id="desc_id" placeholder="Description"/>
+    <select id="worker_id">
+        <option>---select---</option>
+    </select>
+    <button id="update">Update</button>
+  </div>
+
+
+<script>
+// get group mst data
+getWorkeriD()
+function getWorkeriD(){
+    url = "http://127.0.0.1:8082/manager/getmanager"
+    fetch(url)
+    .then(res=>res.json())
+    //get manager name and set in select option
+    .then(data=>{
+        // console.log(data);
+        var worker = document.getElementById("worker");
+        for(var i=0;i<data.length;i++){
+            var option = document.createElement("option");
+            option.value = data[i].manager_id;
+            option.innerHTML = data[i].manager_name;
+            worker.appendChild(option);
+        }
+    })
+}
+
+//post group mst data
+document.getElementById("btn").addEventListener("click",function(){
+    var g_name = document.getElementById("g_name").value;
+    var g_type = document.getElementById("g-type").value;
+    var desc = document.getElementById("desc").value;
+    var worker = document.getElementById("worker").value;
+    var data = {
+        "group_name":g_name,
+        "group_type":g_type,
+        "description":desc,
+        "worker_id":worker
+    }
+    // console.log(data);
+    url = "http://127.0.0.1:8082/nameGroupMst/addgroup"
+    fetch(url,{
+        method:"POST",
+        headers:{
+            "Content-Type":"application/json"
+        },
+        body:JSON.stringify(data)
+    })
+    .then(res=>res.json())
+    .then(data=>{
+        // console.log(data);
+            alert("data inserted successfully");
+            window.location.reload();
+    })
+})
+
+//display data in table
+// displayData()
+// function displayData(){
+    const table = document.querySelector("table");
+    url = "http://127.0.0.1:8082/nameGroupMst/getgroup"
+    fetch(url)
+    .then(res=>res.json())
+    .then(data=>{
+data.forEach((item,index)=>{
+    const row = table.insertRow(index+1);
+    const cell1 = row.insertCell(0);
+    const cell2 = row.insertCell(1);
+    const cell3 = row.insertCell(2);
+    const cell4 = row.insertCell(3);
+    const cell5 = row.insertCell(4);
+    const cell6 = row.insertCell(5);
+    const cell7 = row.insertCell(6);
+    cell1.innerHTML = index+1;
+    cell2.innerHTML = item.group_name;
+    cell3.innerHTML = item.group_type;
+    cell4.innerHTML = item.description;
+    cell5.innerHTML = item.worker_id;
+    cell6.innerHTML = `<button id="edit" data-id="${item.group_no}">Edit</button>`;
+    cell7.innerHTML = `<button id="delete" data-id="${item.group_no}" >Delete</button>`;
+
+})
+    })
+
+//get manager data
+fetch('http://localhost:8082/manager/getmanager')
+.then(res=>res.json())
+.then(data=>{
+    console.log(data);
+    var manager = document.getElementById("worker_id");
+    for(var i=0;i<data.length;i++){
+        var option = document.createElement("option");
+        option.value = data[i].manager_id;
+        option.innerHTML = data[i].manager_name;
+        manager.appendChild(option);
+
+        
+    }
+})
+
+// Get the modal
+var modal = document.getElementById("myModal");
+
+// Get the button that opens the modal
+var btn = document.getElementById("myBtn");
+
+// Get the <span> element that closes the modal
+var span = document.getElementsByClassName("close")[0];
+
+// When the user clicks the button, open the modal
+table.addEventListener("click",function(e){
+    if(e.target.id == 'edit'){
+        let id = e.target.dataset.id;
+        console.log(id);
+        fetch(`http://localhost:8082/nameGroupMst/getgroup/${id}`)
+        .then(res=>res.json())
+        .then(data=>{
+            console.log(data);
+            modal.style.display = "block";
+            document.getElementById("group_name").value = data.group_name;
+            document.getElementById("group_type").value = data.group_type;
+            document.getElementById("desc_id").value = data.description;
+            document.getElementById("worker_id").value = data.worker_id;
+            document.getElementById("update").addEventListener("click",function(){
+                var g_name = document.getElementById("group_name").value;
+                var g_type = document.getElementById("group_type").value;
+                var desc = document.getElementById("desc_id").value;
+                var worker = document.getElementById("worker_id").value;
+                var data = {
+                    "group_name":g_name,
+                    "group_type":g_type,
+                    "description":desc,
+                    "worker_id":worker
+                }
+                console.log(data);
+                fetch(`http://localhost:8082/nameGroupMst/editgroup/${id}`,{
+                    method:"PUT",
+                    headers:{
+                        "Content-Type":"application/json"
+                    },
+                    body:JSON.stringify(data)
+                })
+                .then(res=>res.json())
+                .then(data=>{
+                    console.log(data);
+                        alert("data updated successfully");
+                        window.location.reload();
+                })
+            })
+        })
+    }
+})
+
+//delete the data
+table.addEventListener("click",function(e){
+    if(e.target.id == 'delete'){
+        let id = e.target.dataset.id;
+        console.log(id);
+        fetch(`http://localhost:8082/nameGroupMst/deletegroup/${id}`,{
+            method:"DELETE",
+            headers:{
+                "Content-Type":"application/json"
+            }
+        })
+        .then(res=>res.json())
+        .then(data=>{
+            console.log(data);
+                alert("data deleted successfully");
+                window.location.reload();
+        })
+    }
+})
+    
+
+
+
+</script>
+</body>
+</html>

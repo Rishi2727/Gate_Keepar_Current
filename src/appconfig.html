@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
+    <title>Server setup</title>
+    <link rel="stylesheet" href="./style.css">
+  </head>
+  <body>
+    <div id="bg"></div>
+
+    <form>
+      <h1>Server Config</h1>
+      <div class="form-field">
+        <input type="text" placeholder="Host" id="host" required/>
+      </div>
+      <div class="form-field">
+        <input type="text" placeholder="port" id="port" required/>
+      </div>
+      <div class="form-field">
+        <!-- select drop down for database type                      -->
+        <select name="DatabaseType" id="DatabaseType" required>
+          <option value="Select">----Select----</option>
+          <option value="Mariadb">Mariadb/MySql</option>
+          <option value="Oracle">Oracle</option>
+          <option value="MSSQL">MSSQL</option>
+          <option value="PostgreSQL">PostgreSQL</option>
+          <option value="SQLite">SQLite</option>
+          <option value="MongoDB">MongoDB</option>
+          <option value="SQLite">SQLite</option>
+          <option value="MongoDB">MongoDB</option>
+        </select>
+          </div>
+      <div class="form-field">
+        <input type="text" placeholder="DatabaseName" id="DatabaseName" required />
+      </div>
+      <div class="form-field">
+        <input type="text" placeholder="username" id="username" required/>
+      </div>
+      <div class="form-field">
+        <input type="text" placeholder="password" id="password" required/>
+      </div>
+    <div class="form-field">
+      <button class="btn" type="submit" id="btn">Submit</button>
+    </div>
+  </form>
+    <script src="./renderer.js"></script>
+  </body>
+</html>
