@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organization</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+</head>
+</head>
+<body>
+    <a href="../index.html" >back to home</a>
+    <h1>Organization</h1>
+    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal">+ Add</button>
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">name</th>
+                <th scope="col">address</th>
+                <th scope="col">contact_no</th>
+                <th scope="col">contact_person</th>
+                <th scope="col">description</th>
+                <th scope="col">logo_image</th> 
+                <th scope="col">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+      </table>
+
+      <!-- ---------------------------model--------------------------- -->
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Add Organization</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="name" aria-describedby="emailHelp">
+                    </div>
+                    <div class="mb-3">
+                        <label for="address" class="form-label">Address</label>
+                        <input type="text" class="form-control" id="address">
+                    </div>
+                    <div class="mb-3">
+                        <label for="contact_no" class="form-label">Contact No</label>
+                        <input type="text" class="form-control" id="contact_no">
+                    </div>
+                    <div class="mb-3">
+                        <label for="contact_person" class="form-label">Contact Person</label>
+                        <input type="text" class="form-control" id="contact_person">
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <input type="text" class="form-control" id="description">
+                    </div>
+                    <div class="mb-3">
+                        <label for="logo_image" class="form-label">Logo Image</label>
+                        <input type="file" class="form-control" id="logo_image">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary add-org">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ---------------------------model for edit--------------------------- -->
+
+<!-- Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Edit Organization</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="editname" aria-describedby="emailHelp">
+                    </div>
+                    <div class="mb-3">
+                        <label for="address" class="form-label">Address</label>
+                        <input type="text" class="form-control" id="editaddress">
+                    </div>
+                    <div class="mb-3">
+                        <label for="contact_no" class="form-label">Contact No</label>
+                        <input type="text" class="form-control" id="editcontact_no">
+                    </div>
+                    <div class="mb-3">
+                        <label for="contact_person" class="form-label">Contact Person</label>
+                        <input type="text" class="form-control" id="editcontact_person">
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <input type="text" class="form-control" id="editdescription">
+                    </div>
+                    <div class="mb-3">
+                        <label for="logo_image" class="form-label">Logo Image</label>
+                        <input type="file" class="form-control" id="editlogo_image">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary edit-org"id="edit-org">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+<script>
+
+//get all organization from api
+const getOrganization = async () => {
+    const response = await fetch('http://127.0.0.1:8082/organization/getAllOrg');
+    const data = await response.json();
+    console.log(data);
+    return data;
+}
+getOrganization();
+
+// set organization data to table
+const setOrganization = async () => {
+    const data = await getOrganization();
+    console.log(data);
+    const table = document.querySelector('tbody');
+    data.forEach((item, index) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <th scope="row">${index + 1}</th>
+            <td>${item.name}</td>
+            <td>${item.address}</td>
+            <td>${item.contact_no}</td>
+            <td>${item.contact_person}</td>
+            <td>${item.description}</td>
+            <td>${item.logo_image}</td>
+            <td>
+                <button type="button" id="edit" class="btn btn-primary" data-id="${item.id}" data-bs-toggle="modal" data-bs-target="#editModal">Edit</button>
+                <button type="button" id ="delete" class="btn btn-danger" data-id="${item.id}">Delete</button>
+            </td>
+        `;
+        table.appendChild(row);
+    });
+}
+setOrganization();
+
+
+//add organization
+const orgName = document.querySelector('#name');
+const orgAddress = document.querySelector('#address');
+const orgContactNo = document.querySelector('#contact_no');
+const orgContactPerson = document.querySelector('#contact_person');
+const orgDescription = document.querySelector('#description');
+const orgLogoImage = document.querySelector('#logo_image');
+const addOrgBtn = document.querySelector('.add-org');
+// add button click event
+addOrgBtn.addEventListener('click', () => {
+    addOrganization(orgName.value, orgAddress.value, orgContactNo.value, orgContactPerson.value, orgDescription.value, orgLogoImage.value);
+});
+
+const addOrganization = async (orgName, orgAddress,orgContactNo, orgContactPerson, orgDescription, orgLogoImage) => {
+    const response = await fetch('http://127.0.0.1:8082/organization/addOrg', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            name: orgName,
+            address: orgAddress,
+            contact_no: orgContactNo,
+            contact_person: orgContactPerson,
+            description: orgDescription,
+            logo_image: null,
+        })
+    });
+    const data = await response.json();
+    console.log(data);
+    alert('Organization Added Successfully');
+    window.location.reload();
+    return data;
+}
+
+
+
+//delete organization
+const table = document.querySelector("table");
+table.addEventListener('click', (e) => {
+    if (e.target.id === 'delete') {
+        const id = e.target.dataset.id;
+        deleteOrganization(id);
+    }
+});
+
+const deleteOrganization = async (id) => {
+    const response = await fetch(`http://127.0.0.1:8082/organization/deleteOrg/${id}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+    const data = await response.json();
+    console.log(data);
+    alert('Organization Deleted Successfully');
+    window.location.reload();
+    return data;
+}
+
+//edit organization
+const editOrgName = document.querySelector('#editname');
+const editOrgAddress = document.querySelector('#editaddress');
+const editOrgContactNo = document.querySelector('#editcontact_no');
+const editOrgContactPerson = document.querySelector('#editcontact_person');
+const editOrgDescription = document.querySelector('#editdescription');
+const editOrgLogoImage = document.querySelector('#editlogo_image');
+const editOrgBtn = document.querySelector('.edit-org');
+//get organization data to edit modal
+const editModal = document.querySelector('#editModal');
+editModal.addEventListener('show.bs.modal', (e) => {
+    const id = e.relatedTarget.dataset.id;
+    getOrganizationById(id);
+});
+
+
+const getOrganizationById = async (id) => {
+    const response = await fetch(`http://127.0.0.1:8082/organization/getOrg/${id}`);
+    const data = await response.json();
+    console.log(data);
+    editOrgName.value = data.name;
+    editOrgAddress.value = data.address;
+    editOrgContactNo.value = data.contact_no;
+    editOrgContactPerson.value = data.contact_person;
+    editOrgDescription.value = data.description;
+    editOrgLogoImage.value = data.logo_image;
+    document.getElementById('edit-org').addEventListener("click",function(){
+        let name = editOrgName.value;
+        let address = editOrgAddress.value;
+        let contact_no = editOrgContactNo.value;
+        let contact_person = editOrgContactPerson.value;
+        let description = editOrgDescription.value;
+        let logo_image = editOrgLogoImage.value;
+        let data = {
+            name: name,
+            address: address,
+            contact_no: contact_no,
+            contact_person: contact_person,
+            description: description,
+            logo_image: null,
+        }
+        console.log(data);
+        fetch(`http://127.0.0.1:8082/organization/editOrg/${id}`,{
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        }).then(res => res.json())
+        .then(data => {
+            console.log(data);
+            alert('Organization Updated Successfully');
+            window.location.reload();
+        })
+    });
+
+ 
+}
+
+
+
+
+</script>
+</body>
+</html>

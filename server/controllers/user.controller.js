@@ -11,6 +11,7 @@ const createUser = async(req, res) => {
         if(!org_id || !name || !email || !password || !phone_no || !address || !description || !user_group_id || !rfid_card_id) {
             return res.status(httpStatus.BAD_REQUEST).send("Please provide all required fields");
         }
+        
         const user = await prisma.user.create({
             data: {
                 org_id: org_id,

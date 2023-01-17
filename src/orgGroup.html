@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+</head>
+<body>
+
+    <a href="../index.html" >back to home</a>
+    <h1>Organization Group</h1>
+    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#orgModal">+ Add</button>
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Organization</th>
+                <th scope="col">Group Name</th>
+                <th scope="col">Description</th>
+                <th scope="col">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+      </table>
+
+      <!-- Modal add data -->
+<div class="modal fade" id="orgModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Add Organization Group</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Organization</label>
+                        <select class="form-control" id="org-id" aria-label="Default select example">
+                            <option selected>---Select Organization---</option>
+                            <!-- <option value="1">One</option>
+                            <option value="2">Two</option>
+                            <option value="3">Three</option> -->
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="address" class="form-label">Group Name</label>
+                        <input type="text" class="form-control" id="groupName">
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <input type="text" class="form-control" id="description">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary add-org">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+ <!-- Modal edit data -->
+ <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">EditOrganization Group</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Organization</label>
+                        <select class="form-control" id="edit-org-id" aria-label="Default select example">
+                            <option selected>---Select Organization---</option>
+                            <!-- <option value="1">One</option>
+                            <option value="2">Two</option>
+                            <option value="3">Three</option> -->
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="address" class="form-label">Group Name</label>
+                        <input type="text" class="form-control" id="editgroupName">
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <input type="text" class="form-control" id="editdescription">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary edit-org">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- toas message -->
+<div style="position: absolute;top:10px;right: 50px; z-index: 999;">
+    <div class="toast align-items-center text-white bg-success border-0" role="alert" >
+        <div class="d-flex">
+          <div class="toast-body">
+            Organization Group Added Successfully
+          </div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+      </div>
+</div>
+
+
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script>
+
+        // get all group
+        function getAllGroup() {
+            url = "http://127.0.0.1:8082/orgGroup/getAllOrgGroups";
+            fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                let html = "";
+                data.forEach((item, index) => {
+                    html += `
+                        <tr>
+                            <th scope="row">${index + 1}</th>
+                            <td>${item.org_name}</td>
+                            <td>${item.name}</td>
+                            <td>${item.description}</td>
+                            <td>
+                                <button type="button" id="edit" data-id="${item.id}" data-bs-toggle="modal" data-bs-target="#editModal" class="btn btn-primary">Edit</button>
+                                <button type="button" id="delete" data-id="${item.id}" class="btn btn-danger">Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                document.querySelector("tbody").innerHTML = html;
+            })
+            .catch(err => console.log(err));
+        }
+        getAllGroup();
+
+        // get the orgainzation
+        function getOrganization() {
+            url = "http://127.0.0.1:8082/organization/getAllOrg"
+            fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                let html = "";
+                data.forEach((item, index) => {
+                    html += `
+                        <option value="${item.id}">${item.name}</option>
+                    `;
+                });
+                document.querySelector("#org-id").innerHTML += html;
+            })
+            .catch(err => console.log(err));
+        }
+        getOrganization();
+
+        // add organization group
+        document.querySelector(".add-org").addEventListener("click", function() {
+            let orgId = document.querySelector("#org-id").value;
+            let name = document.querySelector("#groupName").value;
+            let description = document.querySelector("#description").value;
+            let data = {
+                org_id: orgId,
+                name: name,
+                description: description
+            }
+            url = "http://127.0.0.1:8082/orgGroup/addOrgGroup"
+            fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                getAllGroup();
+
+                //after add the data, clear the input field and close the modal
+                document.querySelector("#org-id").value = "";
+                document.querySelector("#groupName").value = "";
+                document.querySelector("#description").value = "";
+                // call the close function
+                var myModalEl = document.getElementById('orgModal')
+                var modal = bootstrap.Modal.getInstance(myModalEl)
+                modal.hide()
+
+                // show the toast
+                var toastElList = [].slice.call(document.querySelectorAll('.toast'))
+                var toastList = toastElList.map(function (toastEl) {
+                    return new bootstrap.Toast(toastEl)
+                })
+                toastList.forEach(toast => toast.show())
+
+
+            
+
+                
+
+
+
+            })
+            .catch(err => console.log(err));
+        });
+
+
+        // edit organization group
+        
+
+    </script>
+</body>
+</html>

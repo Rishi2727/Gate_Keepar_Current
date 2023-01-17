@@ -12,3 +12,5 @@ module.exports.deviceTypeController = require('./device_type.controller');
 module.exports.deviceLogController = require('./device_log.controller');
 module.exports.commandsController = require('./commands.controller');
 module.exports.rfidController = require('./rfid_card.controller');
+module.exports.portsController = require('./ports.controller');
+module.exports.devicesSetupController = require('./devicesSetup.controller');

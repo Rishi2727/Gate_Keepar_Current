@@ -32,7 +32,17 @@ const createOrgGroup = async (req, res) => {
 const getAllOrgGroups = async (req, res) => {
     try {
         const result = await prisma.organization_group.findMany();
-        res.status(httpStatus.OK).send(result);
+// add organization name to the result
+        const orgs = await prisma.organization.findMany();
+        const orgsMap = orgs.reduce((acc, org) => {
+            acc[org.id] = org.name;
+            return acc;
+        }, {});
+        const resultWithOrgName = result.map((orgGroup) => {
+            orgGroup.org_name = orgsMap[orgGroup.org_id];
+            return orgGroup;
+        });
+        res.status(httpStatus.OK).send(resultWithOrgName);
     }
     catch (error) {
         res.status(httpStatus.INTERNAL_SERVER_ERROR).send(error);
@@ -61,7 +71,7 @@ const getAllOrgGroupsByOrgId = async (req, res) => {
 // get organization group by id
 const getOrgGroupById = async (req, res) => {
     try {
-        const result = await prisma.organization.findUnique({
+        const result = await prisma.organization_group.findUnique({
             where: {
                 id: Number(req.params.id),
             },
