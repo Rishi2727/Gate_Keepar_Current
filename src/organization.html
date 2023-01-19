@@ -125,10 +125,11 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 <script>
+let endpoint = 'http://localhost:8082/';
 
 //get all organization from api
 const getOrganization = async () => {
-    const response = await fetch('http://127.0.0.1:8082/organization/getAllOrg');
+    const response = await fetch(endpoint + 'organization/getAllOrg');
     const data = await response.json();
     console.log(data);
     return data;
@@ -175,7 +176,7 @@ addOrgBtn.addEventListener('click', () => {
 });
 
 const addOrganization = async (orgName, orgAddress,orgContactNo, orgContactPerson, orgDescription, orgLogoImage) => {
-    const response = await fetch('http://127.0.0.1:8082/organization/addOrg', {
+    const response = await fetch(endpoint+'organization/addOrg', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -208,7 +209,7 @@ table.addEventListener('click', (e) => {
 });
 
 const deleteOrganization = async (id) => {
-    const response = await fetch(`http://127.0.0.1:8082/organization/deleteOrg/${id}`, {
+    const response = await fetch(endpoint+`organization/deleteOrg/${id}`, {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json'
@@ -238,7 +239,7 @@ editModal.addEventListener('show.bs.modal', (e) => {
 
 
 const getOrganizationById = async (id) => {
-    const response = await fetch(`http://127.0.0.1:8082/organization/getOrg/${id}`);
+    const response = await fetch(endpoint+`organization/getOrg/${id}`);
     const data = await response.json();
     console.log(data);
     editOrgName.value = data.name;
@@ -263,7 +264,7 @@ const getOrganizationById = async (id) => {
             logo_image: null,
         }
         console.log(data);
-        fetch(`http://127.0.0.1:8082/organization/editOrg/${id}`,{
+        fetch(endpoint+`organization/editOrg/${id}`,{
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'

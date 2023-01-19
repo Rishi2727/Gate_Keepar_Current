@@ -37,6 +37,7 @@ router.use('/rfid', rfidRouter);
 // router.use('/ports', portsRouter);
 router.use('/devicesSetup', devicesSetupRouter);
 
+const path = require('path');
 
 
 
@@ -44,5 +45,6 @@ router.get('/', (req, res) => {
     res.send('Welcome to Gate API-- please choose a correct url')
 
 })
+
 
 module.exports = router;

@@ -9,18 +9,15 @@
 </head>
 <body>
     <a href="../index.html" >back to home</a>
-    <h1>Organization Group</h1>
-    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal">+ Add</button>
+    <h1>Permission Group</h1>
+    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#permissionGroupModal">+ Add</button>
     <table class="table table-hover">
         <thead>
             <tr>
                 <th scope="col">#</th>
-                <th scope="col">name</th>
-                <th scope="col">address</th>
-                <th scope="col">contact_no</th>
-                <th scope="col">contact_person</th>
-                <th scope="col">description</th>
-                <th scope="col">logo_image</th>
+                <th scope="col">organization</th>
+                <th scope="col">Group Name</th>
+                <th scope="col">Permission</th>
                 <th scope="col">Action</th>
             </tr>
         </thead>
@@ -29,8 +26,315 @@
         </tbody>
       </table>
 
+ <!-- Modal add data -->
+ <div class="modal fade" id="permissionGroupModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Add Organization Group</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Organization</label>
+                        <select class="form-control" id="org-id" aria-label="Default select example">
+                            <option selected>---Select Organization---</option>
+                            <!-- <option value="1">One</option>
+                            <option value="2">Two</option>
+                            <option value="3">Three</option> -->
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="address" class="form-label">Group Name</label>
+                        <input type="text" class="form-control" id="groupName">
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Permission</label>
+                        <select class="form-control" id="permission-id" aria-label="Default select example">
+                            <option selected>---Select Permission---</option>
+                            <!-- <option value="1">One</option>
+                            <option value="2">Two</option>
+                            <option value="3">Three</option> -->
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary add-permission-group">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+ <!-- Modal edit data -->
+ <div class="modal fade" id="editPermissionGroupModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Add Organization Group</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Organization</label>
+                        <select class="form-control" id="edit-org-id" aria-label="Default select example">
+                            <option selected>---Select Organization---</option>
+                            <!-- <option value="1">One</option>
+                            <option value="2">Two</option>
+                            <option value="3">Three</option> -->
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="address" class="form-label">Group Name</label>
+                        <input type="text" class="form-control" id="edit-group-name">
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Permission</label>
+                        <select class="form-control" id="edit-permission-id" aria-label="Default select example">
+                            <option selected>---Select Permission---</option>
+                            <!-- <option value="1">One</option>
+                            <option value="2">Two</option>
+                            <option value="3">Three</option> -->
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary edit-permission-group">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<!-- toas message -->
+<div style="position: absolute;top:10px;right: 50px; z-index: 999;">
+    <div class="toast align-items-center text-white bg-success border-0" role="alert" >
+        <div class="d-flex">
+          <div class="toast-body">
+            Permission Group Added Successfully
+          </div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+      </div>
+</div>
+
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     <script>
+        let endpoint = 'http://localhost:8082/';
+        //get all permission group
+        function getAllPermissionGroup(){
+            url = endpoint + 'userGroup/getAllUserGroups';
+            fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                let html = '';
+                data.forEach(element => {
+                    html += `<tr>
+                                <td>${element.id}</td>
+                                <td>${element.org_name}</td>
+                                <td>${element.group_name}</td>
+                                <td>${element.permission_name}</td>
+                                <td>
+                                    <button class="btn btn-primary edit-permission-group-btn" data-bs-toggle="modal" data-bs-target="#editPermissionGroupModal" data-id="${element.id}">Edit</button>
+                                    <button class="btn btn-danger delete-permission-group-btn" data-id="${element.id}">Delete</button>
+                                </td>
+                            </tr>`;
+                });
+                document.querySelector('tbody').innerHTML = html;
+            })
+
+        }
+        getAllPermissionGroup();
+
+                // get the orgainzation
+                function getOrganization() {
+            url = endpoint+"organization/getAllOrg";
+            fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                let html = '';
+                data.forEach(element => {
+                    html += `<option value="${element.id}">${element.name}</option>`;
+                });
+                document.querySelector('#org-id').innerHTML += html;
+                document.querySelector('#edit-org-id').innerHTML += html;
+            })
+        }
+        getOrganization();
+
+        // get the permission
+        function getPermission() {
+            url = endpoint+"permission/getAllPermissions";
+            fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                let html = '';
+                data.forEach(element => {
+                    html += `<option value="${element.id}">${element.name}</option>`;
+                });
+                document.querySelector('#permission-id').innerHTML += html;
+                document.querySelector('#edit-permission-id').innerHTML += html;
+            })
+        }
+        getPermission();
+
+        // add permission group
+        document.querySelector('.add-permission-group').addEventListener('click', function(){
+            let orgId = document.querySelector('#org-id').value;
+            let groupName = document.querySelector('#groupName').value;
+            let permissionId = document.querySelector('#permission-id').value;
+            let data = {
+                org_id: parseInt(orgId),
+                group_name: groupName,
+                permission_id: parseInt(permissionId)
+            }
+            console.log(data);
+            url = endpoint + 'userGroup/addUserGroup';
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                getAllPermissionGroup();
+                //after add the data, clear the input field and close the modal
+                document.querySelector('#org-id').value = '';
+                document.querySelector('#groupName').value = '';
+                document.querySelector('#permission-id').value = '';
+                // call the close function
+                var myModalEl = document.getElementById('permissionGroupModal')
+                var modal = bootstrap.Modal.getInstance(myModalEl)
+                modal.hide()
+                // show the toast
+                var tostMsg = document.querySelector(".toast-body");
+                tostMsg.innerHTML = "Permission Group Added successfully";
+
+                var toastElList = [].slice.call(document.querySelectorAll('.toast'))
+                var toastList = toastElList.map(function (toastEl) {
+                    return new bootstrap.Toast(toastEl)
+                })
+                toastList.forEach(toast => toast.show())
+            })
+            .catch(error => {
+                console.log(error);
+            })
+        })
+
+        // edit permission group
+        document.querySelector('tbody').addEventListener('click', function(e){
+            if(e.target.classList.contains('edit-permission-group-btn')){
+                let id = e.target.getAttribute('data-id');
+                url = endpoint + 'userGroup/getUserGroupById/' + id;
+                fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    document.querySelector('#edit-org-id').value = data.org_id;
+                    document.querySelector('#edit-group-name').value = data.group_name;
+                    document.querySelector('#edit-permission-id').value = data.permission_id;
+                    document.querySelector('.edit-permission-group').setAttribute('data-id', data.id);
+                })
+                .catch(error => {
+                    console.log(error);
+                })
+            }
+        })
+
+        // update permission group
+        document.querySelector('.edit-permission-group').addEventListener('click', function(){
+            let id = this.getAttribute('data-id');
+            let orgId = document.querySelector('#edit-org-id').value;
+            let groupName = document.querySelector('#edit-group-name').value;
+            let permissionId = document.querySelector('#edit-permission-id').value;
+            let data = {
+                org_id: parseInt(orgId),
+                group_name: groupName,
+                permission_id: parseInt(permissionId)
+            }
+            console.log(data);
+            url = endpoint + 'userGroup/editUserGroupById/' + id;
+            fetch(url, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                getAllPermissionGroup();
+                //after add the data, clear the input field and close the modal
+                document.querySelector('#edit-org-id').value = '';
+                document.querySelector('#edit-group-name').value = '';
+                document.querySelector('#edit-permission-id').value = '';
+                // call the close function
+                var myModalEl = document.getElementById('editPermissionGroupModal')
+                var modal = bootstrap.Modal.getInstance(myModalEl)
+                modal.hide()
+                // show the toast
+                var tostMsg = document.querySelector(".toast-body");
+                tostMsg.innerHTML = "Permission Group Updated successfully";
+
+                var toastElList = [].slice.call(document.querySelectorAll('.toast'))
+                var toastList = toastElList.map(function (toastEl) {
+                    return new bootstrap.Toast(toastEl)
+                })
+                toastList.forEach(toast => toast.show())
+            })
+            .catch(error => {
+                console.log(error);
+            })
+        }) 
+
+        // delete permission group
+        document.querySelector('tbody').addEventListener('click', function(e){
+            if(e.target.classList.contains('delete-permission-group-btn')){
+                let id = e.target.getAttribute('data-id');
+                url = endpoint + 'userGroup/deleteUserGroupById/' + id;
+                fetch(url, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    getAllPermissionGroup();
+                    // show the toast
+                    var tostMsg = document.querySelector(".toast-body");
+                    tostMsg.innerHTML = "Permission Group Deleted successfully";
+
+                    var toastElList = [].slice.call(document.querySelectorAll('.toast'))
+                    var toastList = toastElList.map(function (toastEl) {
+                        return new bootstrap.Toast(toastEl)
+                    })
+                    toastList.forEach(toast => toast.show())
+                })
+                .catch(error => {
+                    console.log(error);
+                })
+            }
+        })
+
+        
 
     </script>
 </body>

@@ -37,7 +37,48 @@ const createUser = async(req, res) => {
 const getAllUsers = async(req, res) => {
     try {
         const users = await prisma.user.findMany();
-        res.status(httpStatus.OK).send(users);
+        //get orgainzation name
+        const usersWithOrgName = await Promise.all(users.map(async(user) => {
+            const org = await prisma.organization.findUnique({
+                where: {
+                    id: user.org_id
+                }
+            });
+            return {
+                ...user,
+                org_name: org.name
+            };
+        }
+        ));
+        //get user group name
+        const usersWithUserGroupName = await Promise.all(usersWithOrgName.map(async(user) => {
+            const userGroup = await prisma.user_group.findUnique({
+                where: {
+                    id: user.user_group_id
+                }
+            });
+            return {
+                ...user,
+                user_group_name: userGroup.group_name
+            };
+        }
+        ));
+        //get rfid card name
+        const usersWithRfidCardName = await Promise.all(usersWithUserGroupName.map(async(user) => {
+            const rfidCard = await prisma.rfid_card.findUnique({
+                where: {
+                    id: user.rfid_card_id
+                }
+            });
+            return {
+                ...user,
+                rfid_card_name: rfidCard.card_no
+            };
+        }
+        ));
+        res.status(httpStatus.OK).send(usersWithRfidCardName);
+
+
     } catch (error) {
         res.status(httpStatus.BAD_REQUEST).send(error);
     }
@@ -127,7 +168,7 @@ const deleteUser = async(req, res) => {
         if (!user) {
             return res.status(httpStatus.NOT_FOUND).send("User not found");
         }
-        res.status(httpStatus.OK).send("User deleted successfully");
+        res.status(httpStatus.OK).send(user);
     } catch (error) {
         res.status(httpStatus.BAD_REQUEST).send(error);
     }

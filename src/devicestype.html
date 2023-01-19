@@ -9,18 +9,15 @@
 </head>
 <body>
     <a href="../index.html" >back to home</a>
-    <h1>Organization Group</h1>
-    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal">+ Add</button>
+    <h1>Devices Type</h1>
+    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addDeviceTypeModal">+ Add</button>
     <table class="table table-hover">
         <thead>
             <tr>
                 <th scope="col">#</th>
-                <th scope="col">name</th>
-                <th scope="col">address</th>
-                <th scope="col">contact_no</th>
-                <th scope="col">contact_person</th>
-                <th scope="col">description</th>
-                <th scope="col">logo_image</th>
+                <th scope="col">Device Type</th>
+                <th scope="col">Description</th>
+                <th scope="col">Operation</th>
                 <th scope="col">Action</th>
             </tr>
         </thead>
@@ -29,8 +26,217 @@
         </tbody>
       </table>
 
+       <!-- Modal add data -->
+ <div class="modal fade" id="addDeviceTypeModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Add Device Type</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label for="address" class="form-label">Device Type</label>
+                        <input type="text" class="form-control" id="name">
+                    </div>
+                    <div class="mb-3">
+                        <label for="address" class="form-label">Description</label>
+                        <input type="text" class="form-control" id="description">
+                    </div>
+                    <div class="mb-3">
+                        <label for="address" class="form-label">Operation</label>
+                        <input type="text" class="form-control" id="operation">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary add-device-type">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal add data -->
+<div class="modal fade" id="editDeviceTypeModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Edit Device Type</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label for="address" class="form-label">Device Type</label>
+                        <input type="text" class="form-control" id="editname">
+                    </div>
+                    <div class="mb-3">
+                        <label for="address" class="form-label">Description</label>
+                        <input type="text" class="form-control" id="editdescription">
+                    </div>
+                    <div class="mb-3">
+                        <label for="address" class="form-label">Operation</label>
+                        <input type="text" class="form-control" id="editoperation">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary edit-device-type">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- toast message -->
+<div style="position: absolute;top:10px;right: 50px; z-index: 999;">
+    <div class="toast align-items-center text-white bg-success border-0" role="alert" >
+        <div class="d-flex">
+          <div class="toast-body">
+            Device Type Added Successfully
+          </div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+      </div>
+</div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     <script>
+        let endpoint = 'http://localhost:8082/';
+        // get device type
+        function getDeviceType(){
+            fetch(endpoint+'deviceType/getAllDeviceTypes')
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                let html = '';
+                data.forEach((item, index) => {
+                    html += `
+                    <tr>
+                        <th scope="row">${index+1}</th>
+                        <td>${item.name}</td>
+                        <td>${item.description}</td>
+                        <td>${item.operation}</td>
+                        <td>
+                            <button type="button" class="btn btn-primary edit-device-type" data-bs-toggle="modal" data-bs-target="#editDeviceTypeModal" data-id="${item.id}">Edit</button>
+                            <button type="button" class="btn btn-danger delete-device-type" data-id="${item.id}">Delete</button>
+                        </td>
+                    </tr>
+                    `;
+                });
+                document.querySelector('tbody').innerHTML = html;
+            })
+        }
+        getDeviceType();
+
+        // add device type
+        document.querySelector('.add-device-type').addEventListener('click', function(){
+            let name = document.querySelector('#name').value;
+            let description = document.querySelector('#description').value;
+            let operation = document.querySelector('#operation').value;
+            let data = {
+                name: name,
+                description: description,
+                operation: operation
+            }
+            fetch(endpoint+'deviceType/addDeviceType', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                getDeviceType();
+                document.querySelector('#name').value = '';
+                document.querySelector('#description').value = '';
+                document.querySelector('#operation').value = '';
+                document.querySelector('#addDeviceTypeModal').style.display = 'none';
+                document.querySelector('.toast').style.display = 'block';
+                
+                 // call the close function
+                    var myModalEl = document.getElementById('addDeviceTypeModal')
+                    var modal = bootstrap.Modal.getInstance(myModalEl)  
+                    modal.hide()
+
+                    // show the toast
+                var tostMsg = document.querySelector(".toast-body");
+                tostMsg.innerHTML = "Device Type Added Successfully";
+
+                var toastElList = [].slice.call(document.querySelectorAll('.toast'))
+                var toastList = toastElList.map(function (toastEl) {
+                    return new bootstrap.Toast(toastEl)
+                });
+                toastList.forEach(toast => toast.show());
+
+        });
+        });
+
+        // edit device type
+        document.querySelector('tbody').addEventListener('click', function(e){
+            if(e.target.classList.contains('edit-device-type')){
+                let id = e.target.getAttribute('data-id');
+                // console.log(id)
+                fetch(endpoint+'deviceType/getDeviceTypeById/'+id)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    document.querySelector('#editname').value = data.name;
+                    document.querySelector('#editdescription').value = data.description;
+                    document.querySelector('#editoperation').value = data.operation;
+                    document.querySelector('.edit-device-type').setAttribute('data-id', data.id);
+                })
+            }
+        });
+
+        // update device type
+        document.querySelector('.edit-device-type').addEventListener('click', function(){
+            let id = this.getAttribute('data-id');
+            console.log(id)
+            let name = document.querySelector('#editname').value;
+            let description = document.querySelector('#editdescription').value;
+            let operation = document.querySelector('#editoperation').value;
+            let data = {
+                name: name,
+                description: description,
+                operation: operation
+            }
+            fetch(endpoint+'deviceType/editDeviceType/'+id, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                getDeviceType();
+                document.querySelector('#editDeviceTypeModal').style.display = 'none';
+                document.querySelector('.toast').style.display = 'block';
+                
+                // call the close function
+                    var myModalEl = document.getElementById('editDeviceTypeModal')
+                    var modal = bootstrap.Modal.getInstance(myModalEl)  
+                    modal.hide()
+
+                    // show the toast
+                var tostMsg = document.querySelector(".toast-body");
+                tostMsg.innerHTML = "Device Type Updated Successfully";
+
+                var toastElList = [].slice.call(document.querySelectorAll('.toast'))
+                var toastList = toastElList.map(function (toastEl) {
+                    return new bootstrap.Toast(toastEl)
+                });
+                toastList.forEach(toast => toast.show());
+            });
+        });
+
 
     </script>
 </body>

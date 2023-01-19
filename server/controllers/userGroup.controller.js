@@ -28,7 +28,33 @@ const createUserGroup = async(req, res) => {
 const getAllUserGroups = async(req, res) => {
     try {
         const userGroups = await prisma.user_group.findMany();
-        res.status(httpStatus.OK).send(userGroups);
+//add organization name to userGroup
+        const userGroupsWithOrgName = await Promise.all(userGroups.map(async(userGroup) => {
+            const org = await prisma.organization.findUnique({
+                where: {
+                    id: userGroup.org_id
+                }
+            });
+            return {
+                ...userGroup,
+                org_name: org.name
+            };
+        }
+        ));
+//add permission name to userGroup
+        const userGroupsWithPermissionName = await Promise.all(userGroupsWithOrgName.map(async(userGroup) => {
+            const permission = await prisma.permission.findUnique({
+                where: {
+                    id: userGroup.permission_id
+                }
+            });
+            return {
+                ...userGroup,
+                permission_name: permission.name
+            };
+        }
+        ));
+        res.status(httpStatus.OK).send(userGroupsWithPermissionName);
     }
     catch (error) {
         res.status(httpStatus.BAD_REQUEST).send(error);
