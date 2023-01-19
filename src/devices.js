@@ -1,15 +1,23 @@
+const endpoint = "http://localhost:8082/"
+const table = document.querySelector("table");
+const tbody = document.querySelector("tbody");
+
+if (window.electronAPI) {
+
 const connectedDevices = window.electronAPI.sendSyncData();
+console.log(connectedDevices);
+
+
 
 setTimeout(() => {
   // console.log(connectedDevices)
 }, 1000);
 
-const table = document.querySelector("table");
-const tbody = document.querySelector("tbody");
+
 
 const getDevices = () => {
   const temp = [];
-  const url = "http://127.0.0.1:8082/devicesSetup/getAllDevices";
+  const url = endpoint+"devicesSetup/getAllDevices";
   fetch(url)
     .then((res) => res.json())
     .then((data) => {
@@ -79,7 +87,7 @@ addDevice.addEventListener("click", (e) => {
       vendorId: row.children[8].textContent,
     };
     // console.log(data)
-    const url = "http://127.0.0.1:8082/devicesSetup/addDevice";
+    const url = endpoint+"devicesSetup/addDevice";
     fetch(url, {
       method: "POST",
       headers: {
@@ -91,5 +99,62 @@ addDevice.addEventListener("click", (e) => {
       .then((data) => console.log(data));
     alert("Device added successfully");
     window.location.reload();
+    
   }
 });
+
+}else{
+  console.log("no electron api")
+  // search button is disabled
+  const searchDevices = document.querySelector(".btn-primary");
+  searchDevices.disabled = true;
+
+  // get all devices from the database
+  const getDevices = () => {
+    const temp = [];
+    const url = endpoint+"devicesSetup/getAllDevices";
+    fetch(url)
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data, "dbData");
+        if (data.length === 0) {
+          data = [
+            {
+              friendlyName: "friendlyName",
+              locationId: "locationId",
+              manufacturer: "manufacturer",
+              path: "path",
+              pnpId: "pnpId",
+              productId: "productId",
+              serialNumber: "serialNumber",
+              vendorId: "vendorId",
+            },
+          ];
+        }
+
+        let id = 1;
+        let html = ``;
+        data.forEach((device) => {
+          // show all devices exept the ones that are already in the database
+          html += `
+    <tr>
+        <td>${id++}</td>
+        <td>${device.friendlyName}</td>
+        <td>${device.locationId}</td>
+        <td>${device.manufacturer}</td>
+        <td>${device.path}</td>
+        <td>${device.pnpId}</td>
+        <td>${device.productId}</td>
+        <td>${device.serialNumber}</td>
+        <td>${device.vendorId}</td>
+    </tr>
+    `;
+
+          tbody.innerHTML = html;
+        });
+      });
+  };
+
+  getDevices();
+
+}

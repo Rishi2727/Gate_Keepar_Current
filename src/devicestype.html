@@ -85,7 +85,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary edit-device-type">Submit</button>
+                <button type="button" class="btn btn-primary" id="edit-device-type">Submit</button>
             </div>
         </div>
     </div>
@@ -189,15 +189,15 @@
                     document.querySelector('#editname').value = data.name;
                     document.querySelector('#editdescription').value = data.description;
                     document.querySelector('#editoperation').value = data.operation;
-                    document.querySelector('.edit-device-type').setAttribute('data-id', data.id);
+                    document.querySelector('#edit-device-type').setAttribute('data-id', data.id);
                 })
             }
         });
 
         // update device type
-        document.querySelector('.edit-device-type').addEventListener('click', function(){
+        document.querySelector('#edit-device-type').addEventListener('click', function(){
             let id = this.getAttribute('data-id');
-            console.log(id)
+            console.log(id);
             let name = document.querySelector('#editname').value;
             let description = document.querySelector('#editdescription').value;
             let operation = document.querySelector('#editoperation').value;
@@ -234,7 +234,35 @@
                     return new bootstrap.Toast(toastEl)
                 });
                 toastList.forEach(toast => toast.show());
-            });
+            })
+        });
+
+        // delete device type
+        document.querySelector('tbody').addEventListener('click', function(e){
+            if(e.target.classList.contains('delete-device-type')){
+                let id = e.target.getAttribute('data-id');
+                fetch(endpoint+'deviceType/deleteDeviceType/'+id, {
+                    method: 'DELETE'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    getDeviceType();
+
+                    // show the toast
+                var tostMsg = document.querySelector(".toast-body");
+                tostMsg.innerHTML = "Device Type Deleted Successfully";
+
+                var toastElList = [].slice.call(document.querySelectorAll('.toast'))
+                var toastList = toastElList.map(function (toastEl) {
+                    return new bootstrap.Toast(toastEl)
+                });
+                toastList.forEach(toast => toast.show());
+                })
+                .catch(err => {
+                    console.log(err);
+                })
+            }
         });
 
 

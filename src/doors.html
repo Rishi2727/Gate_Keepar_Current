@@ -9,18 +9,16 @@
 </head>
 <body>
     <a href="../index.html" >back to home</a>
-    <h1>Organization Group</h1>
-    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal">+ Add</button>
+    <h1>Doors</h1>
+    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#doorModal">+ Add</button>
     <table class="table table-hover">
         <thead>
             <tr>
                 <th scope="col">#</th>
-                <th scope="col">name</th>
-                <th scope="col">address</th>
-                <th scope="col">contact_no</th>
-                <th scope="col">contact_person</th>
-                <th scope="col">description</th>
-                <th scope="col">logo_image</th>
+                <th scope="col">Organization</th>
+                <th scope="col">Door</th>
+                <th scope="col">Description</th>
+                <th scope="col">Door No</th>
                 <th scope="col">Action</th>
             </tr>
         </thead>
@@ -29,8 +27,297 @@
         </tbody>
       </table>
 
+      <!-- Modal add data -->
+ <div class="modal fade" id="doorModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Doors</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Organization</label>
+                        <select class="form-control" id="org-id" aria-label="Default select example">
+                            <option selected>---Select Organization---</option>
+                            <!-- <option value="1">One</option>
+                            <option value="2">Two</option>
+                            <option value="3">Three</option> -->
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="address" class="form-label">Door</label>
+                        <input type="text" class="form-control" id="door">
+                    </div>
+                    <div class="mb-3">
+                        <label for="address" class="form-label">Description</label>
+                        <input type="text" class="form-control" id="description">
+                    </div>
+                    <div class="mb-3">
+                        <label for="address" class="form-label">Door No</label>
+                        <input type="text" class="form-control" id="doorNo">
+                    </div>
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary add-door">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+      <!-- Modal edit data -->
+      <div class="modal fade" id="editDoorModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Doors</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Organization</label>
+                            <select class="form-control" id="edit-org-id" aria-label="Default select example">
+                                <option selected>---Select Organization---</option>
+                                <!-- <option value="1">One</option>
+                                <option value="2">Two</option>
+                                <option value="3">Three</option> -->
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="address" class="form-label">Door</label>
+                            <input type="text" class="form-control" id="edit-door">
+                        </div>
+                        <div class="mb-3">
+                            <label for="address" class="form-label">Description</label>
+                            <input type="text" class="form-control" id="edit-description">
+                        </div>
+                        <div class="mb-3">
+                            <label for="address" class="form-label">Door No</label>
+                            <input type="text" class="form-control" id="edit-doorNo">
+                        </div>
+    
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary edit-door">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- toas message -->
+<div style="position: absolute;top:10px;right: 50px; z-index: 999;">
+    <div class="toast align-items-center text-white bg-success border-0" role="alert" >
+        <div class="d-flex">
+          <div class="toast-body">
+            Door Added Successfully
+          </div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+      </div>
+</div>
+
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     <script>
+        let endpoint = 'http://localhost:8082/';
+
+        // get all doors
+        function getAllDoors(){
+            url = endpoint + 'doors/getAllDoors';
+            fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                let tbody = document.querySelector('tbody');
+                tbody.innerHTML = '';
+                data.forEach((item, index) => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <th scope="row">${index + 1}</th>
+                            <td>${item.org_name}</td>
+                            <td>${item.name}</td>
+                            <td>${item.description}</td>
+                            <td>${item.door_no}</td>
+                            <td>
+                                <button class="btn btn-primary edit-door-btn" data-bs-toggle="modal" data-bs-target="#editDoorModal" data-id="${item.id}">Edit</button>
+                                <button class="btn btn-danger delete-door-btn" data-id="${item.id}">Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            })
+        }
+
+        getAllDoors();
+
+        // get all organizations
+        function getAllOrganizations(){
+            url = endpoint + 'organization/getAllOrg';
+            fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                let html = '';
+                data.forEach(element => {
+                    html += `<option value="${element.id}">${element.name}</option>`;
+                });
+                document.querySelector('#org-id').innerHTML += html;
+                document.querySelector('#edit-org-id').innerHTML += html;
+            })
+        }
+
+        getAllOrganizations();
+
+        // add door
+        let addDoorBtn = document.querySelector('.add-door');
+        addDoorBtn.addEventListener('click', function(){
+            let orgId = document.querySelector('#org-id').value;
+            let door = document.querySelector('#door').value;
+            let description = document.querySelector('#description').value;
+            let doorNo = document.querySelector('#doorNo').value;
+
+            let data = {
+                org_id: parseInt(orgId),
+                name: door,
+                description: description,
+                door_no: doorNo
+            }
+
+            url = endpoint + 'doors/addDoor';
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                getAllDoors();
+                
+                //after add the data, clear the input field and close the modal
+                document.querySelector('#org-id').value = '';
+                document.querySelector('#door').value = '';
+                document.querySelector('#description').value = '';
+                document.querySelector('#doorNo').value = '';
+
+                 // call the close function
+                var myModalEl = document.getElementById('doorModal')
+                var modal = bootstrap.Modal.getInstance(myModalEl)
+                modal.hide()
+
+                    // show the toast
+                var tostMsg = document.querySelector(".toast-body");
+                tostMsg.innerHTML = "Door Added Successfully";
+                var toastElList = [].slice.call(document.querySelectorAll('.toast'))
+                var toastList = toastElList.map(function (toastEl) {
+                return new bootstrap.Toast(toastEl)
+                })
+                toastList.forEach(toast => toast.show())
+            })
+        });
+        
+        // edit door
+        document.querySelector('tbody').addEventListener('click', function(e){
+            if(e.target.classList.contains('edit-door-btn')){
+                let id = e.target.getAttribute('data-id');
+                url = endpoint + 'doors/getDoorById/' + id;
+                fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    document.querySelector('#edit-org-id').value = data.org_id;
+                    document.querySelector('#edit-door').value = data.name;
+                    document.querySelector('#edit-description').value = data.description;
+                    document.querySelector('#edit-doorNo').value = data.door_no;
+                    document.querySelector('.edit-door').setAttribute('data-id', data.id);
+                })
+            }
+        });
+
+        // update door
+        document.querySelector('.edit-door').addEventListener('click', function(){
+            let id = this.getAttribute('data-id');
+            let orgId = document.querySelector('#edit-org-id').value;
+            let door = document.querySelector('#edit-door').value;
+            let description = document.querySelector('#edit-description').value;
+            let doorNo = document.querySelector('#edit-doorNo').value;
+
+            let data = {
+                org_id: parseInt(orgId),
+                name: door,
+                description: description,
+                door_no: doorNo
+            }
+
+            url = endpoint + 'doors/editDoorById/' + id;
+            fetch(url, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                getAllDoors();
+
+                //after add the data, clear the input field and close the modal
+                document.querySelector('#edit-org-id').value = '';
+                document.querySelector('#edit-door').value = '';
+                document.querySelector('#edit-description').value = '';
+                document.querySelector('#edit-doorNo').value = '';
+
+                // call the close function
+                var myModalEl = document.getElementById('editDoorModal')
+                var modal = bootstrap.Modal.getInstance(myModalEl)
+                modal.hide()
+
+                 // show the toast
+                 var tostMsg = document.querySelector(".toast-body");
+                tostMsg.innerHTML = "Door Updated Successfully";
+                var toastElList = [].slice.call(document.querySelectorAll('.toast'))
+                var toastList = toastElList.map(function (toastEl) {
+                return new bootstrap.Toast(toastEl)
+                })
+                toastList.forEach(toast => toast.show())
+
+            })
+        });
+
+        // delete door
+        document.querySelector('tbody').addEventListener('click', function(e){
+            if(e.target.classList.contains('delete-door-btn')){
+                let id = e.target.getAttribute('data-id');
+                url = endpoint + 'doors/deleteDoorById/' + id;
+                fetch(url, {
+                    method: 'DELETE'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    getAllDoors();
+
+                    // show the toast
+                    var tostMsg = document.querySelector(".toast-body");
+                    tostMsg.innerHTML = "Door Deleted Successfully";
+                    var toastElList = [].slice.call(document.querySelectorAll('.toast'))
+                    var toastList = toastElList.map(function (toastEl) {
+                    return new bootstrap.Toast(toastEl)
+                    })
+                    toastList.forEach(toast => toast.show())
+                })
+            }
+        });
 
     </script>
 </body>

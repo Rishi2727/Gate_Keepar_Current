@@ -9,29 +9,261 @@
 </head>
 <body>
     <a href="../index.html" >back to home</a>
-    <h1>Organization Group</h1>
-    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal">+ Add</button>
+    <h1>Commands</h1>
+    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addCommandModal">+ Add</button>
     <table class="table table-hover">
         <thead>
             <tr>
                 <th scope="col">#</th>
-                <th scope="col">name</th>
-                <th scope="col">address</th>
-                <th scope="col">contact_no</th>
-                <th scope="col">contact_person</th>
+                <th scope="col">Command</th>
+                <th scope="col">Value</th>
                 <th scope="col">description</th>
-                <th scope="col">logo_image</th>
                 <th scope="col">Action</th>
             </tr>
         </thead>
         <tbody>
-
         </tbody>
       </table>
 
+       <!-- Modal add data -->
+ <div class="modal fade" id="addCommandModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Add Commands</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label for="address" class="form-label">Command</label>
+                        <input type="text" class="form-control" id="command">
+                    </div>
+                    <div class="mb-3">
+                        <label for="address" class="form-label">Hex-Value</label>
+                        <input type="text" class="form-control" id="hex-value">
+                    </div>
+                    <div class="mb-3">
+                        <label for="address" class="form-label">description</label>
+                        <input type="text" class="form-control" id="description">
+                    </div>
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary add-command">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+       <!-- Modal edit data -->
+       <div class="modal fade" id="editCommandModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Edit Commands</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="address" class="form-label">Command</label>
+                            <input type="text" class="form-control" id="edit-command">
+                        </div>
+                        <div class="mb-3">
+                            <label for="address" class="form-label">Hex-Value</label>
+                            <input type="text" class="form-control" id="edit-hex-value">
+                        </div>
+                        <div class="mb-3">
+                            <label for="address" class="form-label">description</label>
+                            <input type="text" class="form-control" id="edit-description">
+                        </div>
+    
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary aedit-command">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <!-- toas message -->
+<div style="position: absolute;top:10px;right: 50px; z-index: 999;">
+    <div class="toast align-items-center text-white bg-success border-0" role="alert" >
+        <div class="d-flex">
+          <div class="toast-body">
+            commands Added Successfully
+          </div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+      </div>
+</div>
+
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     <script>
+        let endpoint = 'http://localhost:8082/';
 
+        // get all commands
+        function getAllCommands(){
+            fetch(endpoint + 'commands/getAllCommands')
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                let tbody = document.querySelector('tbody');
+                tbody.innerHTML = '';
+                data.forEach((command, index) => {
+                    tbody.innerHTML += `
+                    <tr>
+                        <th scope="row">${index + 1}</th>
+                        <td>${command.name}</td>
+                        <td>${command.command_value}</td>
+                        <td>${command.description}</td>
+                        <td>
+                            <button type="button" class="btn btn-primary edit-command" data-bs-toggle="modal" data-bs-target="#editCommandModal" data-id="${command.id}">Edit</button>
+                            <button type="button" class="btn btn-danger delete-command" data-id="${command.id}">Delete</button>
+                        </td>
+                    </tr>
+                    `
+                });
+            })
+        }
+        getAllCommands();
+
+        // add command
+        let addCommandBtn = document.querySelector('.add-command');
+        addCommandBtn.addEventListener('click', function(){
+            let command = document.querySelector('#command').value;
+            let hexValue = document.querySelector('#hex-value').value;
+            let description = document.querySelector('#description').value;
+
+            let data = {
+                name: command,
+                command_value: hexValue,
+                description: description
+            }
+
+            fetch(endpoint + 'commands/addCommand', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                getAllCommands();
+                //after add the data, clear the input field and close the modal
+                document.querySelector('#command').value = '';
+                document.querySelector('#hex-value').value = '';
+                document.querySelector('#description').value = '';
+
+                // call the close function
+                var myModalEl = document.getElementById('addCommandModal')
+                var modal = bootstrap.Modal.getInstance(myModalEl)
+                modal.hide()
+
+                // show the toast
+                var tostMsg = document.querySelector(".toast-body");
+                tostMsg.innerHTML = "Command Added Successfully";
+                var toastElList = [].slice.call(document.querySelectorAll('.toast'))
+                var toastList = toastElList.map(function (toastEl) {
+                    return new bootstrap.Toast(toastEl)
+                });
+                toastList.forEach(toast => toast.show());
+               
+            })
+        })
+
+        // edit command
+        document.querySelector('tbody').addEventListener('click', function(e){
+            if(e.target.classList.contains('edit-command')){
+                let id = e.target.getAttribute('data-id');
+                fetch(endpoint + 'commands/getCommandById/' + id)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    document.querySelector('#edit-command').value = data.name;
+                    document.querySelector('#edit-hex-value').value = data.command_value;
+                    document.querySelector('#edit-description').value = data.description;
+                    document.querySelector('.aedit-command').setAttribute('data-id', data.id);
+                })
+            }
+        })
+
+        // update command
+        document.querySelector('.aedit-command').addEventListener('click', function(){
+            let id = this.getAttribute('data-id');
+            let command = document.querySelector('#edit-command').value;
+            let hexValue = document.querySelector('#edit-hex-value').value;
+            let description = document.querySelector('#edit-description').value;
+
+            let data = {
+                name: command,
+                command_value: hexValue,
+                description: description
+            }
+
+            fetch(endpoint + 'commands/editCommand/' + id, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                getAllCommands();
+                //after add the data, clear the input field and close the modal
+                document.querySelector('#edit-command').value = '';
+                document.querySelector('#edit-hex-value').value = '';
+                document.querySelector('#edit-description').value = '';
+
+                // call the close function
+                var myModalEl = document.getElementById('editCommandModal')
+                var modal = bootstrap.Modal.getInstance(myModalEl)
+                modal.hide()
+
+                // show the toast
+                var tostMsg = document.querySelector(".toast-body");
+                tostMsg.innerHTML = "Command Updated Successfully";
+                var toastElList = [].slice.call(document.querySelectorAll('.toast'))
+                var toastList = toastElList.map(function (toastEl) {
+                    return new bootstrap.Toast(toastEl)
+                });
+                toastList.forEach(toast => toast.show());
+            })
+        })
+
+        // delete command
+        document.querySelector('tbody').addEventListener('click', function(e){
+            if(e.target.classList.contains('delete-command')){
+                let id = e.target.getAttribute('data-id');
+                fetch(endpoint + 'commands/deleteCommand/' + id, {
+                    method: 'DELETE'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    getAllCommands();
+                    // show the toast
+                    var tostMsg = document.querySelector(".toast-body");
+                    tostMsg.innerHTML = "Command Deleted Successfully";
+                    var toastElList = [].slice.call(document.querySelectorAll('.toast'))
+                    var toastList = toastElList.map(function (toastEl) {
+                        return new bootstrap.Toast(toastEl)
+                    });
+                    toastList.forEach(toast => toast.show());
+                })
+            }
+        })
     </script>
 </body>
 </html>

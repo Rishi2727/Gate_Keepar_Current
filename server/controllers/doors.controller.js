@@ -35,7 +35,21 @@ const createDoor = async (req, res) => {
 const getAllDoors = async (req, res) => {
     try {
         const doors = await prisma.doors.findMany();
-        res.status(httpStatus.OK).send(doors);
+        // add orgainzation name 
+        const doorsWithOrgName = await Promise.all(doors.map(async (door) => {
+            const org = await prisma.organization.findUnique({
+                where: {
+                    id: door.org_id
+                }
+            });
+            return {
+                ...door,
+                org_name: org.name
+            };
+        }
+        ));
+        res.status(httpStatus.OK).send(doorsWithOrgName);
+        
     }
     catch (error) {
         res.status(httpStatus.BAD_REQUEST).send(error);
